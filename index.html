@@ -46,9 +46,18 @@ textarea:focus,input:focus,select:focus{outline:2px solid var(--brand2);border-c
 .prog{font-size:12px;color:var(--muted);margin-left:auto}
 .bar-p{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin-bottom:16px}
 .bar-p div{height:100%;background:var(--grad);width:0;transition:width .2s}
+.gate h3{margin:0 0 4px;font-size:20px;color:var(--brand-dk)}
+.gate p{margin:0 0 16px;color:var(--muted);font-size:14px}
+.gate .peek{filter:blur(5px);user-select:none;pointer-events:none;max-height:90px;overflow:hidden;margin-bottom:14px;-webkit-mask-image:linear-gradient(#000 40%,transparent);mask-image:linear-gradient(#000 40%,transparent)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chk{display:flex;gap:9px;align-items:flex-start;font-size:12.5px;color:var(--muted);margin:4px 0 14px;line-height:1.4}
+.chk input{width:18px;height:18px;margin-top:1px;flex-shrink:0;accent-color:var(--brand)}
+.err{color:#c0262d;font-size:12px;margin-top:4px;display:none}.f.bad .err{display:block}.f.bad input,.f.bad select{border-color:#c0262d}
+.gate .btn{width:100%;padding:13px}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;transition:.2s;pointer-events:none}
 .toast.on{opacity:1}
 @media(max-width:860px){
+ .row2{grid-template-columns:1fr}
  body{flex-direction:column}
  aside{width:100%;height:auto;position:sticky;top:0;z-index:20;padding:10px 0 10px;overflow:visible;background:#3a1478;background:linear-gradient(135deg,#4a1a8a,#2a0a3e)}
  .logo{display:block;padding:0 16px 8px}.logo img{max-width:130px}
@@ -93,6 +102,7 @@ textarea:focus,input:focus,select:focus{outline:2px solid var(--brand2);border-c
         <button class="tab on" data-m="copy">Copy pronta</button>
         <button class="tab" data-m="ia">Prompt para IA</button>
       </div>
+      <div id="gate" class="gate" style="display:none"><h3>Sua copy está pronta 🎉</h3><p>Deixe seus dados para liberar o resultado e copiar.</p><div class="peek out" id="peek"></div><form id="lead" novalidate><div class="f"><label>Nome</label><input name="nome" autocomplete="name" placeholder="Seu nome"><div class="err">Informe seu nome</div></div><div class="row2"><div class="f"><label>WhatsApp</label><input name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="(11) 99999-9999"><div class="err">Informe DDD + número</div></div><div class="f"><label>E-mail</label><input name="email" type="email" autocomplete="email" placeholder="voce@email.com"><div class="err">E-mail inválido</div></div></div><div class="row2"><div class="f"><label>Instagram <em>(opcional)</em></label><input name="instagram" placeholder="@seuperfil"></div><div class="f"><label>Área de atuação</label><select name="area"><option value="">Selecione…</option><option>Saúde e bem-estar</option><option>Nutrição</option><option>Psicologia / terapia</option><option>Estética e beleza</option><option>Educação / cursos</option><option>Consultoria / serviços</option><option>Varejo / e-commerce</option><option>Outro</option></select><div class="err">Escolha uma opção</div></div></div><div class="f"><label>Você já investe em anúncios?</label><select name="anuncia"><option value="">Selecione…</option><option>Sim, todo mês</option><option>Já testei, mas parei</option><option>Ainda não</option></select><div class="err">Escolha uma opção</div></div><div class="f"><label class="chk" style="margin:0 0 14px"><input type="checkbox" name="consent"><span>Concordo em receber contato da Mantora Lab e com o uso dos meus dados conforme a LGPD.</span></label><div class="err">Aceite para continuar</div></div><button class="btn" type="submit" id="lsend">Liberar minha copy</button></form></div>
       <div id="extra" class="f" style="display:none">
         <label>Tom de voz <em>(opcional)</em></label>
         <select id="tom">
@@ -107,7 +117,7 @@ textarea:focus,input:focus,select:focus{outline:2px solid var(--brand2);border-c
         </select>
       </div>
       <div class="out" id="out"></div>
-      <div class="bar">
+      <div class="bar" id="cbar">
         <button class="btn" id="copy">Copiar</button>
         <span class="prog" id="hint"></span>
       </div>
@@ -267,6 +277,11 @@ const HINTS={
  "RECOMPENSA/PRÓXIMO PASSO":"Ex: o guia gratuito / o link da aula"
 };
 
+const CONFIG={
+  // URL que recebe os leads por POST (JSON). Ex: webhook do n8n/Make, Apps Script do Google Sheets ou função do Supabase. Vazio = só guarda no navegador.
+  ENDPOINT:'',
+  LEAD_KEY:'mantora-lead',QUEUE_KEY:'mantora-lead-queue'
+};
 const $=s=>document.querySelector(s);
 const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 let cur=0,mode="copy",store={};
@@ -315,16 +330,50 @@ COPY BASE:
 ${txt}
 """`;
   }
+  if(!unlocked)$("#peek").textContent=filled().slice(0,260);
   const html=esc(txt).replace(/\[([^\]]+)\]/g,"<mark>[$1]</mark>");
   $("#out").innerHTML=html;
   const miss=(txt.match(/\[[^\]]+\]/g)||[]).length;
   $("#hint").textContent=miss?`${miss} campo(s) em branco`:"Tudo preenchido ✓";
 }
+const lget=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}};
+const lset=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+let unlocked=!!lget(CONFIG.LEAD_KEY);
+function applyGate(){
+  const g=$('#gate'),show=!unlocked;
+  g.style.display=show?'block':'none';
+  $('#out').style.display=show?'none':'block';
+  $('#cbar').style.display=show?'none':'flex';
+  document.querySelector('.tabs').style.display=show?'none':'flex';
+  if(show)$('#peek').textContent=filled().slice(0,260);
+}
+async function sendLead(p){
+  if(!CONFIG.ENDPOINT)return false;
+  try{const r=await fetch(CONFIG.ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(p)});return r.ok||r.type==='opaque'}catch(e){return false}
+}
+async function flushQueue(){
+  const q=lget(CONFIG.QUEUE_KEY)||[];if(!q.length||!CONFIG.ENDPOINT)return;
+  const rest=[];for(const p of q){if(!(await sendLead(p)))rest.push(p)}
+  lset(CONFIG.QUEUE_KEY,rest);
+}
+$('#lead').onsubmit=async e=>{
+  e.preventDefault();
+  const f=e.target,v=n=>f.elements[n].value.trim(),bad=(n,c)=>f.elements[n].closest('.f').classList.toggle('bad',!c),dg=v('whatsapp').replace(/\D/g,'');
+  const ok=[['nome',v('nome').length>1],['whatsapp',dg.length>=10&&dg.length<=13],['email',/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v('email'))],['area',!!v('area')],['anuncia',!!v('anuncia')],['consent',f.elements.consent.checked]];
+  ok.forEach(([n,c])=>bad(n,c));
+  if(ok.some(x=>!x[1]))return;
+  const q=new URLSearchParams(location.search),p={nome:v('nome'),whatsapp:dg,email:v('email').toLowerCase(),instagram:v('instagram'),area:v('area'),anuncia:v('anuncia'),consentimento:true,template:T[cur].t,origem:q.get('utm_source')||'',campanha:q.get('utm_campaign')||'',data:new Date().toISOString()};
+  $('#lsend').disabled=true;$('#lsend').textContent='Enviando…';
+  if(!(await sendLead(p))){const qq=lget(CONFIG.QUEUE_KEY)||[];qq.push(p);lset(CONFIG.QUEUE_KEY,qq)}
+  lset(CONFIG.LEAD_KEY,{nome:p.nome,email:p.email});
+  unlocked=true;$('#lsend').disabled=false;$('#lsend').textContent='Liberar minha copy';
+  applyGate();update();
+};
 function render(){
   const t=T[cur];
   $("#ttl").textContent=`Template ${String(cur+1).padStart(2,"0")} · ${t.t}`;
   $("#desc").textContent=t.d;
-  buildNav();buildForm();update();
+  buildNav();buildForm();update();applyGate();
   const on=document.querySelector(".nav.on");if(on&&innerWidth<=860)on.scrollIntoView({inline:"center",block:"nearest"});
 }
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
@@ -340,7 +389,7 @@ $("#copy").onclick=async()=>{
   try{await navigator.clipboard.writeText(txt)}catch(e){const r=document.createRange();r.selectNodeContents($("#out"));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand("copy")}
   const t=$("#toast");t.classList.add("on");setTimeout(()=>t.classList.remove("on"),1400);
 };
-render();
+render();flushQueue();
 </script>
 </body>
 </html>
