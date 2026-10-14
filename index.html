@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="assets/ICONE___GRADIENTE.png"><title>Gerador de Copy Mantora</title>
+<style>
+@font-face{font-family:'Abacaxi';src:url('assets/ABACAXI_Latin_VF.otf') format('opentype');font-weight:100 900;font-display:swap}
+:root{
+  --bg:#f6f3ff; --card:#fff; --ink:#24103a; --muted:#756a91; --line:#e5ddf7;
+  --brand:#744dff; --brand2:#b9a2ff; --brand-dk:#3f0a55; --sideink:#f1ecff; --warn:#fff1cc;
+  --grad:linear-gradient(135deg,#744dff,#4a1a8a);
+  --side:radial-gradient(120% 90% at 0% 100%,#744dff 0%,#4a1a8a 45%,#2a0a3e 100%);
+  --font:'Abacaxi','abacaxi-devanagari',Inter,system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);background:var(--bg);color:var(--ink);display:flex;min-height:100vh}
+aside{width:290px;background:var(--side);color:var(--sideink);padding:22px 14px;position:sticky;top:0;height:100vh;overflow:auto;flex-shrink:0}
+.logo{padding:4px 8px 22px}.logo img{width:100%;max-width:200px;display:block}
+.lbl{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.5;padding:8px 8px}
+.nav{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:0;color:inherit;padding:9px 8px;border-radius:10px;cursor:pointer;font:inherit}
+.nav:hover{background:#ffffff12}.nav.on{background:#ffffff1f}
+.nav .n{width:26px;height:26px;border-radius:7px;border:1px solid #ffffff30;display:grid;place-items:center;font-size:11px;flex-shrink:0}
+.nav.on .n{background:var(--grad);border-color:transparent}
+.nav span{font-size:13px;line-height:1.25}.nav small{display:block;opacity:.55;font-size:11px}
+main{flex:1;padding:34px 32px 60px;max-width:1100px;margin:0 auto;width:100%}
+h1{font-size:28px;margin:0 0 4px;font-weight:700;letter-spacing:-.01em;color:var(--brand-dk)}
+.sub{color:var(--muted);margin:0 0 22px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card h2{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
+.f{margin-bottom:14px}
+.f label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+.f label em{font-style:normal;font-weight:400;color:var(--muted)}
+textarea,input,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:var(--font);font-size:14px;background:#fff;color:var(--ink);resize:vertical}
+textarea{min-height:42px}
+textarea:focus,input:focus,select:focus{outline:2px solid var(--brand2);border-color:transparent}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer}
+.tab.on{background:var(--grad);color:#fff;border-color:transparent}
+.out{white-space:pre-wrap;font-size:15px;line-height:1.6;background:#faf9ff;border:1px solid var(--line);border-radius:12px;padding:16px;min-height:260px}
+.out mark{background:var(--warn);border-radius:4px;padding:0 3px;color:#8a6200}
+.bar{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.btn{border:0;border-radius:10px;padding:10px 16px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;background:var(--grad);color:#fff}
+.btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--line)}
+.prog{font-size:12px;color:var(--muted);margin-left:auto}
+.bar-p{height:6px;background:var(--line);border-radius:9px;overflow:hidden;margin-bottom:16px}
+.bar-p div{height:100%;background:var(--grad);width:0;transition:width .2s}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;transition:.2s;pointer-events:none}
+.toast.on{opacity:1}
+@media(max-width:860px){
+ body{flex-direction:column}
+ aside{width:100%;height:auto;position:sticky;top:0;z-index:20;padding:10px 0 10px;overflow:visible;background:#3a1478;background:linear-gradient(135deg,#4a1a8a,#2a0a3e)}
+ .logo{display:block;padding:0 16px 8px}.logo img{max-width:130px}
+ .lbl{display:none}
+ #nav{display:flex;gap:8px;overflow-x:auto;padding:0 16px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+ #nav::-webkit-scrollbar{display:none}
+ .nav{width:auto;flex:0 0 auto;padding:0;border-radius:10px;scroll-snap-align:center}
+ .nav .n{width:40px;height:40px;border-radius:10px;font-size:13px}
+ .nav span{display:none}
+ main{padding:18px 16px 96px}
+ h1{font-size:22px}
+ .grid{grid-template-columns:1fr;gap:16px}
+ .card{padding:16px;border-radius:14px}
+ textarea,input,select{font-size:16px}
+ .out{min-height:200px;font-size:15px}
+ .tabs .tab{flex:1;text-align:center;padding:10px 8px}
+ .bar .btn{flex:1;padding:13px 16px}
+ #copy{position:fixed;left:16px;right:16px;bottom:14px;z-index:30;box-shadow:0 8px 24px #2a0a3e66;padding:15px}
+ #hint{position:fixed;left:0;right:0;bottom:66px;text-align:center;margin:0;z-index:30;display:none}
+}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><img src="assets/LAB_HORIZ___BRANCO.png" alt="mantora.lab"></div>
+  <div class="lbl">Templates de anúncio</div>
+  <div id="nav"></div>
+</aside>
+<main>
+  <h1 id="ttl"></h1>
+  <p class="sub" id="desc"></p>
+  <div class="grid">
+    <section class="card">
+      <h2>1 · Preencha só o que pedimos</h2>
+      <div class="bar-p"><div id="pbar"></div></div>
+      <div id="form"></div>
+      <div class="bar"><button class="btn ghost" id="clear">Limpar campos</button><span class="prog" id="prog"></span></div>
+    </section>
+    <section class="card">
+      <h2>2 · Sua copy</h2>
+      <div class="tabs">
+        <button class="tab on" data-m="copy">Copy pronta</button>
+        <button class="tab" data-m="ia">Prompt para IA</button>
+      </div>
+      <div id="extra" class="f" style="display:none">
+        <label>Tom de voz <em>(opcional)</em></label>
+        <select id="tom">
+          <option>Direto e confiante</option><option>Acolhedor e empático</option>
+          <option>Provocativo</option><option>Profissional e sóbrio</option><option>Descontraído</option>
+        </select>
+        <div style="height:10px"></div>
+        <label>Onde vai rodar <em>(opcional)</em></label>
+        <select id="plat">
+          <option>Instagram/Facebook Ads (feed)</option><option>Reels / Stories</option>
+          <option>Post orgânico (legenda)</option><option>LinkedIn</option><option>Google Ads</option>
+        </select>
+      </div>
+      <div class="out" id="out"></div>
+      <div class="bar">
+        <button class="btn" id="copy">Copiar</button>
+        <span class="prog" id="hint"></span>
+      </div>
+    </section>
+  </div>
+</main>
+<div class="toast" id="toast">Copiado!</div>
+
+<script>
+const T=[
+{t:"Erro comum + causa real",d:"Mostra o erro do público, explica a causa real e entrega 3 passos. Termina em palavra-chave.",
+ x:`Se você [ERRO COMUM DO PÚBLICO], você está [CONSEQUÊNCIA].
+
+Isso acontece porque [EXPLICAÇÃO SIMPLES].
+
+E aí você percebe que [SINTOMA/PROBLEMA], começa a [COMPORTAMENTO RUIM] e se sente [EMOÇÃO].
+
+Mas o problema não é [CULPADO QUE O PÚBLICO ACHA]. O problema é [CAUSA REAL].
+
+O que resolve isso é:
+[PASSO 1]
+[PASSO 2]
+[PASSO 3]
+
+Se você quer [RESULTADO], comenta [PALAVRA-CHAVE] que eu te mando [RECOMPENSA/PRÓXIMO PASSO].`},
+{t:"Lista de sinais",d:"Lista de sinais de que a pessoa tem um problema sem perceber.",
+ x:`[NÚMERO] sinais de que você [PROBLEMA] (mesmo achando que não)
+
+Se você [DESCREVER ROTINA DO PÚBLICO], isso pode estar te sabotando sem você perceber.
+
+[SINAL X]
+[SINAL Y]
+[SINAL Z]
+
+Quer que eu te ajude a [RESULTADO]? [CTA]`},
+{t:"Pergunta de identificação",d:"Curta, para engajar: dor + solução que falhou + enquete A ou B.",
+ x:`Você também sente que [DOR/PROBLEMA] e parece que ninguém entende?
+
+O pior é que você tenta [SOLUÇÃO COMUM]… mas continua [RESULTADO RUIM].
+
+Se você quer [RESULTADO], responde aqui: você sofre mais com [OPÇÃO A] ou [OPÇÃO B]?`},
+{t:"O que ninguém te conta",d:"Revelação + autoridade pelo padrão que você vê nos clientes + apresentação do produto.",
+ x:`Vou falar uma coisa que ninguém te conta sobre [TEMA].
+
+Se você [COMPORTAMENTO DO PÚBLICO], provavelmente você está [CONSEQUÊNCIA].
+
+E não é porque você [AUTOCRÍTICA DO PÚBLICO]. É porque [CAUSA REAL].
+
+Eu vejo isso todo dia com [CLIENTES/PACIENTES/ALUNOS], e o padrão é sempre o mesmo…
+
+Por isso eu criei [NOME DO PRODUTO/SERVIÇO], pra te ajudar a [PROMESSA REALISTA].
+
+Quer que eu te mande mais informações pelo direct? Responde [PALAVRA] aqui.`},
+{t:"Resultado sem objeção",d:"Direto ao ponto, com 3 benefícios. Bom para tráfego frio com clique.",
+ x:`Quer [RESULTADO DESEJADO] sem [OBJEÇÃO/ESFORÇO]?
+
+Se você [PERFIL DO PÚBLICO], provavelmente já tentou [SOLUÇÃO COMUM] e ainda assim [PROBLEMA].
+O motivo é simples: [EXPLICAÇÃO].
+Com [NOME DO MÉTODO/PRODUTO], você vai [BENEFÍCIO 1], [BENEFÍCIO 2] e [BENEFÍCIO 3].
+
+Clique e veja como funciona.`},
+{t:"História pessoal (antes e depois)",d:"Você conta sua virada: dor, tentativas, insight, resultado.",
+ x:`Antes, eu [DOR/PROBLEMA FORTE].
+
+Eu tentei [SOLUÇÕES], mas só piorava porque [MOTIVO].
+
+Até que eu entendi que [INSIGHT].
+
+Depois disso, eu consegui [RESULTADO REAL].
+
+E é exatamente isso que eu ensino dentro do [PRODUTO/SERVIÇO].
+
+Se você quer [RESULTADO], me manda aqui a palavra '[PALAVRA]'.`},
+{t:"Posicionamento (eu acredito / não acredito)",d:"Filtra o público e reforça sua filosofia. Ótimo para autoridade.",
+ x:`Eu não acredito em [ABORDAGEM QUE VOCÊ REJEITA].
+Eu não trabalho com [TIPO DE CLIENTE].
+Eu não prometo [PROMESSA IRREAL].
+
+Eu acredito em [FILOSOFIA].
+Eu trabalho com [PÚBLICO IDEAL].
+E eu ajudo você a [PROMESSA REALISTA] através de [MÉTODO].
+
+Se isso faz sentido pra você, então você está no perfil certo. Me conta: o que mais você gostaria de ver por aqui? [ABRIR CAIXINHA]`},
+{t:"Problema direto + consequência",d:"Aponta o problema, mostra o efeito bola de neve e apresenta a solução.",
+ x:`[PROBLEMA DIRETO] está te impedindo de [RESULTADO].
+
+E o pior é que quanto mais você [AÇÃO ERRADA], mais você [CONSEQUÊNCIA].
+Daqui a pouco você vai estar [CENÁRIO PIOR], e vai achar que é culpa sua.
+
+O caminho é [SOLUÇÃO]. E é exatamente isso que eu faço em [PRODUTO/SERVIÇO].
+Quer mais detalhes? [CTA]`},
+{t:"Hoje vs. amanhã (imagina só)",d:"Contraste entre a situação atual e o cenário desejado.",
+ x:`Hoje você está [SITUAÇÃO RUIM], se sentindo [EMOÇÃO], e lidando com [PROBLEMAS].
+
+Agora imagina acordar e [RESULTADO], com [BENEFÍCIO] e sem precisar [SACRIFÍCIO].
+
+Isso acontece quando você aplica [MÉTODO]. Eu te ensino isso dentro do [PRODUTO].
+Quer o link? [CTA]`},
+{t:"Cena do dia a dia + prova",d:"Abre com cena, promete resultado e sustenta com lógica, prova social e autoridade.",
+ x:`Você [CENA DO DIA A DIA DO PÚBLICO], e percebe que [DOR].
+
+Eu vou te mostrar como [RESULTADO] sem [OBJEÇÃO].
+
+Isso funciona porque [EXPLICAÇÃO LÓGICA] + [PROVA SOCIAL] + [AUTORIDADE].
+
+Se você quer [RESULTADO], faça [AÇÃO] agora.`},
+{t:"Motivo real do problema",d:"Educa sobre a causa e compara solução certa x solução errada.",
+ x:`Se você quer [RESULTADO], você precisa entender o motivo real de [PROBLEMA].
+
+Isso acontece por causa de [MOTIVO].
+
+E é por isso que [SOLUÇÃO] funciona, enquanto [SOLUÇÃO ERRADA] falha.
+
+Quer que eu te mostre como aplicar a forma certa de lidar com isso? [CTA]`},
+{t:"Quebra de conselho popular",d:"Contraria o que todo mundo fala e propõe um caminho diferente.",
+ x:`Eu sei que todo mundo fala que pra [RESULTADO] você precisa [CONSELHO POPULAR].
+
+Mas isso é exatamente o que está te deixando [PROBLEMA].
+
+O caminho certo é [SOLUÇÃO DIFERENTE].
+
+E eu posso te mostrar como. [CTA]`},
+{t:"Autoridade + dica rápida",d:"Credenciais, um insight forte e uma dica prática antes do convite.",
+ x:`Eu sou [TÍTULO], trabalho com [PÚBLICO] há [TEMPO], e já ajudei [NÚMERO/RESULTADO].
+
+E se tem uma coisa que eu aprendi é: [INSIGHT FORTE].
+
+Se você está [DOR], faça isso: [DICA].
+
+E, se quiser minha ajuda profissional nesse processo, [CTA]`},
+{t:"História de cliente (mudança de crença)",d:"Case contado como história: crença antiga, evento, nova crença e resultado.",
+ x:`Eu tenho uma [CLIENTE/PACIENTE/ALUNA] que acreditava que [CRENÇA ANTIGA].
+
+Por isso ela fazia [AÇÃO] e ela só conseguia [RESULTADO RUIM].
+
+Até que aconteceu [EVENTO] e ela percebeu que [NOVA CRENÇA].
+
+Foi aí que ela conheceu o [MÉTODO] e foi assim que ela conseguiu [RESULTADO].
+
+Se você também quer isso, [CTA]`},
+{t:"Corrija uma coisa só",d:"Foca em um único ponto de alavanca que melhora todo o resto.",
+ x:`Se você corrigir UMA coisa em [TEMA], tudo melhora.
+
+E essa coisa é [PONTO PRINCIPAL].
+
+Porque quando você ajusta isso, automaticamente [EFEITO 1], [EFEITO 2] e [EFEITO 3].
+
+Quer que eu te mostre como ajustar isso no seu caso? [CTA]`}
+];
+
+const HINTS={
+ "ERRO COMUM DO PÚBLICO":"Ex: pula o café da manhã e depois come por ansiedade",
+ "PALAVRA-CHAVE":"Uma palavra só. Ex: QUERO",
+ "PALAVRA":"Uma palavra só. Ex: QUERO",
+ "CTA":"Ex: Clique em saiba mais / Chama no direct",
+ "NÚMERO":"Ex: 5",
+ "RECOMPENSA/PRÓXIMO PASSO":"Ex: o guia gratuito / o link da aula"
+};
+
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+let cur=0,mode="copy",store={};
+try{store=JSON.parse(localStorage.getItem("mantora-copy")||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem("mantora-copy",JSON.stringify(store))}catch(e){}};
+const fields=x=>[...new Set([...x.matchAll(/\[([^\]]+)\]/g)].map(m=>m[1]))];
+const nice=k=>{const l=k.toLowerCase();return l.charAt(0).toUpperCase()+l.slice(1)};
+const key=k=>cur+"::"+k;
+
+function buildNav(){
+  $("#nav").innerHTML=T.map((t,i)=>`<button class="nav ${i==cur?"on":""}" data-i="${i}"><div class="n">${String(i+1).padStart(2,"0")}</div><span>${t.t}</span></button>`).join("");
+  document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>{cur=+b.dataset.i;render()});
+}
+function buildForm(){
+  const t=T[cur];
+  $("#form").innerHTML=fields(t.x).map(k=>`<div class="f"><label>${nice(k)}</label><textarea rows="1" data-k="${k}" placeholder="${HINTS[k]||""}">${esc(store[key(k)]||"")}</textarea></div>`).join("");
+  document.querySelectorAll("#form textarea").forEach(a=>{
+    const grow=()=>{a.style.height="auto";a.style.height=a.scrollHeight+"px"};
+    a.oninput=()=>{store[key(a.dataset.k)]=a.value;save();grow();update()};grow();
+  });
+}
+function filled(){
+  const t=T[cur];
+  return t.x.replace(/\[([^\]]+)\]/g,(m,k)=>(store[key(k)]||"").trim()||m);
+}
+function update(){
+  const t=T[cur],f=fields(t.x),done=f.filter(k=>(store[key(k)]||"").trim()).length;
+  $("#pbar").style.width=(done/f.length*100)+"%";
+  $("#prog").textContent=`${done}/${f.length} campos`;
+  let txt=filled();
+  if(mode=="ia"){
+    txt=`Você é um copywriter brasileiro especialista em anúncios de resposta direta.
+
+Tarefa: reescreva a copy abaixo como um anúncio pronto para ${$("#plat").value}.
+Tom de voz: ${$("#tom").value}.
+
+Regras:
+- Mantenha a estrutura e a ordem das ideias da copy base.
+- Use linguagem simples, frases curtas e fale direto com "você".
+- Não invente resultados, números ou promessas que não estejam na copy base.
+- Mantenha o CTA no final.
+- Entregue 3 variações, cada uma com uma headline diferente (até 10 palavras).
+
+COPY BASE:
+"""
+${txt}
+"""`;
+  }
+  const html=esc(txt).replace(/\[([^\]]+)\]/g,"<mark>[$1]</mark>");
+  $("#out").innerHTML=html;
+  const miss=(txt.match(/\[[^\]]+\]/g)||[]).length;
+  $("#hint").textContent=miss?`${miss} campo(s) em branco`:"Tudo preenchido ✓";
+}
+function render(){
+  const t=T[cur];
+  $("#ttl").textContent=`Template ${String(cur+1).padStart(2,"0")} · ${t.t}`;
+  $("#desc").textContent=t.d;
+  buildNav();buildForm();update();
+  const on=document.querySelector(".nav.on");if(on&&innerWidth<=860)on.scrollIntoView({inline:"center",block:"nearest"});
+}
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{
+  mode=b.dataset.m;
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x==b));
+  $("#extra").style.display=mode=="ia"?"block":"none";
+  update();
+});
+["#tom","#plat"].forEach(s=>$(s).onchange=update);
+$("#clear").onclick=()=>{fields(T[cur].x).forEach(k=>delete store[key(k)]);save();buildForm();update()};
+$("#copy").onclick=async()=>{
+  const txt=$("#out").innerText;
+  try{await navigator.clipboard.writeText(txt)}catch(e){const r=document.createRange();r.selectNodeContents($("#out"));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand("copy")}
+  const t=$("#toast");t.classList.add("on");setTimeout(()=>t.classList.remove("on"),1400);
+};
+render();
+</script>
+</body>
+</html>
